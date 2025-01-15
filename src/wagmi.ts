@@ -1,6 +1,6 @@
-import { http, cookieStorage, createConfig, createStorage } from 'wagmi'
-import { arbitrum, arbitrumSepolia } from 'wagmi/chains'
-import { coinbaseWallet, injected, walletConnect } from 'wagmi/connectors'
+import { http, cookieStorage, createConfig, createStorage } from "wagmi";
+import { arbitrum, arbitrumSepolia } from "wagmi/chains";
+import { coinbaseWallet, injected, walletConnect } from "wagmi/connectors";
 
 export function getConfig() {
   return createConfig({
@@ -8,7 +8,7 @@ export function getConfig() {
     connectors: [
       injected(),
       coinbaseWallet(),
-      walletConnect({ projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID }),
+      walletConnect({ projectId: process.env.WALLET_CONNECT_PROJECT_ID }),
     ],
     storage: createStorage({
       storage: cookieStorage,
@@ -17,12 +17,12 @@ export function getConfig() {
     transports: {
       [arbitrum.id]: http(),
       [arbitrumSepolia.id]: http(),
-    }
-  })
+    },
+  });
 }
 
-declare module 'wagmi' {
+declare module "wagmi" {
   interface Register {
-    config: ReturnType<typeof getConfig>
+    config: ReturnType<typeof getConfig>;
   }
 }
