@@ -91,7 +91,7 @@ const Table = ({ params }: TableProps) => {
                     abi: tableAbi,
                     address: tableAddress,
                     functionName: "sit",
-                    args: [index],
+                    args: [index + 1],
                   },
                   {
                     onError: (e) => {
