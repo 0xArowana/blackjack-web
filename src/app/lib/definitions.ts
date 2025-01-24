@@ -53,13 +53,19 @@ export type PlayerState = {
 };
 
 export type TableInfo = {
+  id: Address;
   manager: Address;
   token: Address;
   gameStatus: GameStatus;
-  players: Address[];
-  playerStates: PlayerState[];
+  seats: SeatInfo[];
+  seatCount: number;
   rules: Rules;
-  maxPlayers: number;
+};
+
+export type SeatInfo = {
+  player: Address;
+  bet: number;
+  waiting: boolean;
 };
 
 export type Address = `0x${string}`;

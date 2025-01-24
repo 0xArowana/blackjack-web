@@ -1,5 +1,10 @@
 export const pitAbi = [
   {
+    type: "constructor",
+    inputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
     type: "function",
     name: "UPGRADE_INTERFACE_VERSION",
     inputs: [],
@@ -17,7 +22,7 @@ export const pitAbi = [
     name: "createTable",
     inputs: [
       {
-        name: "_maxPlayers",
+        name: "_seatCount",
         type: "uint8",
         internalType: "uint8",
       },
@@ -165,7 +170,7 @@ export const pitAbi = [
   },
   {
     type: "function",
-    name: "getTables",
+    name: "getManagerTableInfo",
     inputs: [
       {
         name: "_manager",
@@ -176,8 +181,239 @@ export const pitAbi = [
     outputs: [
       {
         name: "",
-        type: "address[]",
-        internalType: "address[]",
+        type: "tuple[]",
+        internalType: "struct Table.TableInfo[]",
+        components: [
+          {
+            name: "id",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "manager",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "token",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "gameStatus",
+            type: "uint8",
+            internalType: "enum Table.GameStatus",
+          },
+          {
+            name: "seatInfo",
+            type: "tuple[]",
+            internalType: "struct Table.SeatInfo[]",
+            components: [
+              {
+                name: "player",
+                type: "address",
+                internalType: "address",
+              },
+              {
+                name: "bet",
+                type: "uint256",
+                internalType: "uint256",
+              },
+              {
+                name: "waiting",
+                type: "bool",
+                internalType: "bool",
+              },
+            ],
+          },
+          {
+            name: "seatCount",
+            type: "uint8",
+            internalType: "uint8",
+          },
+          {
+            name: "rules",
+            type: "tuple",
+            internalType: "struct Table.Rules",
+            components: [
+              {
+                name: "deckCount",
+                type: "uint8",
+                internalType: "uint8",
+              },
+              {
+                name: "dealerHitOnSoft17",
+                type: "bool",
+                internalType: "bool",
+              },
+              {
+                name: "allowDoubleAfterSplit",
+                type: "bool",
+                internalType: "bool",
+              },
+              {
+                name: "doubleRule",
+                type: "uint8",
+                internalType: "enum Table.DoubleRule",
+              },
+              {
+                name: "maxResplitHands",
+                type: "uint8",
+                internalType: "uint8",
+              },
+              {
+                name: "allowResplitAces",
+                type: "bool",
+                internalType: "bool",
+              },
+              {
+                name: "allowHitSplitAces",
+                type: "bool",
+                internalType: "bool",
+              },
+              {
+                name: "allowLateSurrender",
+                type: "bool",
+                internalType: "bool",
+              },
+              {
+                name: "allowInsurance",
+                type: "bool",
+                internalType: "bool",
+              },
+              {
+                name: "sixToFive",
+                type: "bool",
+                internalType: "bool",
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getPlayerTableInfo",
+    inputs: [
+      {
+        name: "_player",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "tuple",
+        internalType: "struct Table.TableInfo",
+        components: [
+          {
+            name: "id",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "manager",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "token",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "gameStatus",
+            type: "uint8",
+            internalType: "enum Table.GameStatus",
+          },
+          {
+            name: "seatInfo",
+            type: "tuple[]",
+            internalType: "struct Table.SeatInfo[]",
+            components: [
+              {
+                name: "player",
+                type: "address",
+                internalType: "address",
+              },
+              {
+                name: "bet",
+                type: "uint256",
+                internalType: "uint256",
+              },
+              {
+                name: "waiting",
+                type: "bool",
+                internalType: "bool",
+              },
+            ],
+          },
+          {
+            name: "seatCount",
+            type: "uint8",
+            internalType: "uint8",
+          },
+          {
+            name: "rules",
+            type: "tuple",
+            internalType: "struct Table.Rules",
+            components: [
+              {
+                name: "deckCount",
+                type: "uint8",
+                internalType: "uint8",
+              },
+              {
+                name: "dealerHitOnSoft17",
+                type: "bool",
+                internalType: "bool",
+              },
+              {
+                name: "allowDoubleAfterSplit",
+                type: "bool",
+                internalType: "bool",
+              },
+              {
+                name: "doubleRule",
+                type: "uint8",
+                internalType: "enum Table.DoubleRule",
+              },
+              {
+                name: "maxResplitHands",
+                type: "uint8",
+                internalType: "uint8",
+              },
+              {
+                name: "allowResplitAces",
+                type: "bool",
+                internalType: "bool",
+              },
+              {
+                name: "allowHitSplitAces",
+                type: "bool",
+                internalType: "bool",
+              },
+              {
+                name: "allowLateSurrender",
+                type: "bool",
+                internalType: "bool",
+              },
+              {
+                name: "allowInsurance",
+                type: "bool",
+                internalType: "bool",
+              },
+              {
+                name: "sixToFive",
+                type: "bool",
+                internalType: "bool",
+              },
+            ],
+          },
+        ],
       },
     ],
     stateMutability: "view",
@@ -246,6 +482,11 @@ export const pitAbi = [
           },
         ],
       },
+      {
+        name: "_tableImplementation",
+        type: "address",
+        internalType: "address",
+      },
     ],
     outputs: [],
     stateMutability: "nonpayable",
@@ -262,6 +503,32 @@ export const pitAbi = [
       },
     ],
     stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "playerLeft",
+    inputs: [
+      {
+        name: "_player",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "playerSeated",
+    inputs: [
+      {
+        name: "_player",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
     type: "function",
@@ -370,6 +637,25 @@ export const pitAbi = [
         name: "",
         type: "uint256",
         internalType: "uint256",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "s_playerToTable",
+    inputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
       },
     ],
     stateMutability: "view",
@@ -672,22 +958,7 @@ export const pitAbi = [
   },
   {
     type: "error",
-    name: "Pit__InvalidDeckCount",
-    inputs: [],
-  },
-  {
-    type: "error",
     name: "Pit__InvalidEarningsAmountSent",
-    inputs: [],
-  },
-  {
-    type: "error",
-    name: "Pit__InvalidMaxPlayers",
-    inputs: [],
-  },
-  {
-    type: "error",
-    name: "Pit__InvalidMaxResplitHands",
     inputs: [],
   },
   {
@@ -771,6 +1042,11 @@ export const tableAbi = [
         internalType: "struct Table.TableInfo",
         components: [
           {
+            name: "id",
+            type: "address",
+            internalType: "address",
+          },
+          {
             name: "manager",
             type: "address",
             internalType: "address",
@@ -786,19 +1062,14 @@ export const tableAbi = [
             internalType: "enum Table.GameStatus",
           },
           {
-            name: "players",
-            type: "address[]",
-            internalType: "address[]",
-          },
-          {
-            name: "playerStates",
+            name: "seats",
             type: "tuple[]",
-            internalType: "struct Table.PlayerState[]",
+            internalType: "struct Table.SeatInfo[]",
             components: [
               {
-                name: "seat",
-                type: "uint8",
-                internalType: "uint8",
+                name: "player",
+                type: "address",
+                internalType: "address",
               },
               {
                 name: "bet",
@@ -806,43 +1077,16 @@ export const tableAbi = [
                 internalType: "uint256",
               },
               {
-                name: "hands",
-                type: "tuple[]",
-                internalType: "struct Table.Hand[]",
-                components: [
-                  {
-                    name: "cards",
-                    type: "uint8[]",
-                    internalType: "uint8[]",
-                  },
-                  {
-                    name: "minValue",
-                    type: "uint8",
-                    internalType: "uint8",
-                  },
-                  {
-                    name: "aceCount",
-                    type: "uint8",
-                    internalType: "uint8",
-                  },
-                  {
-                    name: "status",
-                    type: "uint8",
-                    internalType: "enum Table.HandStatus",
-                  },
-                  {
-                    name: "doubled",
-                    type: "bool",
-                    internalType: "bool",
-                  },
-                ],
-              },
-              {
-                name: "balance",
-                type: "uint256",
-                internalType: "uint256",
+                name: "waiting",
+                type: "bool",
+                internalType: "bool",
               },
             ],
+          },
+          {
+            name: "seatCount",
+            type: "uint8",
+            internalType: "uint8",
           },
           {
             name: "rules",
@@ -901,11 +1145,6 @@ export const tableAbi = [
               },
             ],
           },
-          {
-            name: "maxPlayers",
-            type: "uint8",
-            internalType: "uint8",
-          },
         ],
       },
     ],
@@ -928,7 +1167,7 @@ export const tableAbi = [
         internalType: "address",
       },
       {
-        name: "_maxPlayers",
+        name: "_seatCount",
         type: "uint8",
         internalType: "uint8",
       },
@@ -1018,7 +1257,13 @@ export const tableAbi = [
   {
     type: "function",
     name: "leave",
-    inputs: [],
+    inputs: [
+      {
+        name: "_seatIndex",
+        type: "uint8",
+        internalType: "uint8",
+      },
+    ],
     outputs: [],
     stateMutability: "nonpayable",
   },
@@ -1050,6 +1295,11 @@ export const tableAbi = [
         name: "_amount",
         type: "uint256",
         internalType: "uint256",
+      },
+      {
+        name: "_seatIndex",
+        type: "uint8",
+        internalType: "uint8",
       },
     ],
     outputs: [],
@@ -1103,92 +1353,6 @@ export const tableAbi = [
   },
   {
     type: "function",
-    name: "s_playerToState",
-    inputs: [
-      {
-        name: "",
-        type: "address",
-        internalType: "address",
-      },
-    ],
-    outputs: [
-      {
-        name: "seat",
-        type: "uint8",
-        internalType: "uint8",
-      },
-      {
-        name: "bet",
-        type: "uint256",
-        internalType: "uint256",
-      },
-      {
-        name: "balance",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "s_players",
-    inputs: [
-      {
-        name: "",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
-    outputs: [
-      {
-        name: "",
-        type: "address",
-        internalType: "address",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "s_seatToPlayer",
-    inputs: [
-      {
-        name: "",
-        type: "uint8",
-        internalType: "uint8",
-      },
-    ],
-    outputs: [
-      {
-        name: "",
-        type: "address",
-        internalType: "address",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "s_seatToWaitingPlayer",
-    inputs: [
-      {
-        name: "",
-        type: "uint8",
-        internalType: "uint8",
-      },
-    ],
-    outputs: [
-      {
-        name: "",
-        type: "address",
-        internalType: "address",
-      },
-    ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
     name: "s_token",
     inputs: [],
     outputs: [
@@ -1227,12 +1391,12 @@ export const tableAbi = [
   },
   {
     type: "function",
-    name: "setMaxPlayers",
+    name: "setRandomWords",
     inputs: [
       {
-        name: "_maxPlayers",
-        type: "uint8",
-        internalType: "uint8",
+        name: "_randomWords",
+        type: "uint256[]",
+        internalType: "uint256[]",
       },
     ],
     outputs: [],
@@ -1240,12 +1404,12 @@ export const tableAbi = [
   },
   {
     type: "function",
-    name: "setRandomWords",
+    name: "setSeatCount",
     inputs: [
       {
-        name: "_randomWords",
-        type: "uint256[]",
-        internalType: "uint256[]",
+        name: "_seatCount",
+        type: "uint8",
+        internalType: "uint8",
       },
     ],
     outputs: [],
@@ -1269,7 +1433,7 @@ export const tableAbi = [
     name: "sit",
     inputs: [
       {
-        name: "_seat",
+        name: "_index",
         type: "uint8",
         internalType: "uint8",
       },
@@ -1377,6 +1541,25 @@ export const tableAbi = [
   },
   {
     type: "event",
+    name: "PlayerSeated",
+    inputs: [
+      {
+        name: "player",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "seat",
+        type: "uint8",
+        indexed: true,
+        internalType: "uint8",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
     name: "TableLocked",
     inputs: [],
     anonymous: false,
@@ -1421,11 +1604,6 @@ export const tableAbi = [
   {
     type: "error",
     name: "Table__BetAlreadyPlaced",
-    inputs: [],
-  },
-  {
-    type: "error",
-    name: "Table__BetExceedsMax",
     inputs: [],
   },
   {
@@ -1480,7 +1658,7 @@ export const tableAbi = [
   },
   {
     type: "error",
-    name: "Table__InsufficientBet",
+    name: "Table__InvalidBetAmount",
     inputs: [],
   },
   {
@@ -1490,7 +1668,12 @@ export const tableAbi = [
   },
   {
     type: "error",
-    name: "Table__InvalidMaxPlayers",
+    name: "Table__InvalidDeckCount",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "Table__InvalidMaxResplitHands",
     inputs: [],
   },
   {
@@ -1501,6 +1684,11 @@ export const tableAbi = [
   {
     type: "error",
     name: "Table__InvalidSeat",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "Table__InvalidSeatCount",
     inputs: [],
   },
   {
@@ -1535,7 +1723,7 @@ export const tableAbi = [
   },
   {
     type: "error",
-    name: "Table__NotCurrentPlayer",
+    name: "Table__NotCurrentSeat",
     inputs: [],
   },
   {
@@ -1556,6 +1744,11 @@ export const tableAbi = [
   {
     type: "error",
     name: "Table__NotPlayerTurnStatus",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "Table__PlayerAlreadySeated",
     inputs: [],
   },
   {
