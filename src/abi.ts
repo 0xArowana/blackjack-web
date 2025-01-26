@@ -205,7 +205,7 @@ export const pitAbi = [
             internalType: "enum Table.GameStatus",
           },
           {
-            name: "seatInfo",
+            name: "seats",
             type: "tuple[]",
             internalType: "struct Table.SeatInfo[]",
             components: [
@@ -330,7 +330,7 @@ export const pitAbi = [
             internalType: "enum Table.GameStatus",
           },
           {
-            name: "seatInfo",
+            name: "seats",
             type: "tuple[]",
             internalType: "struct Table.SeatInfo[]",
             components: [

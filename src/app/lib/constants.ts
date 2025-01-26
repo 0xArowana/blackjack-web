@@ -1,6 +1,6 @@
 import { Token } from "./definitions";
 
-export const pitAddress = "0xBf084a0e34DbB74241f99b8a4ceeC10268494C9b";
+export const pitAddress = "0x6b228FEafBF3fC0F181962Df8026BEd13c0A08cD";
 
 export const tokens: { [key: string]: Token } = {
   USDC: {
