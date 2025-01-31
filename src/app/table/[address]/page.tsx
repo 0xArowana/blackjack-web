@@ -106,7 +106,7 @@ const Table = ({ params }: TableProps) => {
     });
 
     return currentUserMissingBet && !otherPlayerMissingBet;
-  }, [tableInfo]);
+  }, [tableInfo, account.address]);
 
   const occupiedSeats = useMemo(() => {
     let seatCount = 0;
@@ -118,7 +118,7 @@ const Table = ({ params }: TableProps) => {
     });
 
     return seatCount;
-  }, [tableInfo]);
+  }, [tableInfo, account.address]);
 
   if (!tableAddress || !tableInfo) {
     return <div className="loading loading-spinner loading-lg h-full"></div>;

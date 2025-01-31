@@ -17,7 +17,7 @@ const App = () => {
   const account = useAccount();
   const isConnected = account.status === "connected";
 
-  const { data } = useReadContract({
+  const { data, refetch } = useReadContract({
     address: pitAddress,
     abi: pitAbi,
     functionName: "getPlayerTableInfo",
@@ -30,6 +30,10 @@ const App = () => {
     );
     return pair?.[0] ?? "ETH";
   };
+
+  useEffect(() => {
+    refetch();
+  }, [account.address]);
 
   const table = data as TableInfo;
 
