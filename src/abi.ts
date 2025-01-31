@@ -232,6 +232,23 @@ export const pitAbi = [
             internalType: "uint8",
           },
           {
+            name: "betRange",
+            type: "tuple",
+            internalType: "struct Table.BetRange",
+            components: [
+              {
+                name: "min",
+                type: "uint256",
+                internalType: "uint256",
+              },
+              {
+                name: "max",
+                type: "uint256",
+                internalType: "uint256",
+              },
+            ],
+          },
+          {
             name: "rules",
             type: "tuple",
             internalType: "struct Table.Rules",
@@ -355,6 +372,23 @@ export const pitAbi = [
             name: "seatCount",
             type: "uint8",
             internalType: "uint8",
+          },
+          {
+            name: "betRange",
+            type: "tuple",
+            internalType: "struct Table.BetRange",
+            components: [
+              {
+                name: "min",
+                type: "uint256",
+                internalType: "uint256",
+              },
+              {
+                name: "max",
+                type: "uint256",
+                internalType: "uint256",
+              },
+            ],
           },
           {
             name: "rules",
@@ -1011,6 +1045,11 @@ export const pitAbi = [
 
 export const tableAbi = [
   {
+    type: "constructor",
+    inputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
     type: "function",
     name: "cashOut",
     inputs: [],
@@ -1087,6 +1126,23 @@ export const tableAbi = [
             name: "seatCount",
             type: "uint8",
             internalType: "uint8",
+          },
+          {
+            name: "betRange",
+            type: "tuple",
+            internalType: "struct Table.BetRange",
+            components: [
+              {
+                name: "min",
+                type: "uint256",
+                internalType: "uint256",
+              },
+              {
+                name: "max",
+                type: "uint256",
+                internalType: "uint256",
+              },
+            ],
           },
           {
             name: "rules",
@@ -1259,7 +1315,7 @@ export const tableAbi = [
     name: "leave",
     inputs: [
       {
-        name: "_seatIndex",
+        name: "_index",
         type: "uint8",
         internalType: "uint8",
       },
@@ -1295,11 +1351,6 @@ export const tableAbi = [
         name: "_amount",
         type: "uint256",
         internalType: "uint256",
-      },
-      {
-        name: "_seatIndex",
-        type: "uint8",
-        internalType: "uint8",
       },
     ],
     outputs: [],
@@ -1484,6 +1535,25 @@ export const tableAbi = [
   },
   {
     type: "event",
+    name: "BetPlaced",
+    inputs: [
+      {
+        name: "player",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "amount",
+        type: "uint256",
+        indexed: true,
+        internalType: "uint256",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
     name: "BetsStarted",
     inputs: [],
     anonymous: false,
@@ -1535,6 +1605,25 @@ export const tableAbi = [
         type: "address",
         indexed: true,
         internalType: "address",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "PlayerLeft",
+    inputs: [
+      {
+        name: "player",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "seat",
+        type: "uint8",
+        indexed: true,
+        internalType: "uint8",
       },
     ],
     anonymous: false,

@@ -32,6 +32,7 @@ const App = () => {
   };
 
   const table = data as TableInfo;
+
   const players = table?.seats.filter((s) => s.player !== zeroAddress);
 
   return (

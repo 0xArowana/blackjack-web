@@ -17,7 +17,7 @@ import {
   PlayerState,
   TableInfo,
 } from "../../lib/definitions";
-import { zeroAddress } from "viem";
+import { erc20Abi, zeroAddress } from "viem";
 
 interface TableProps {
   params: Promise<{ address: string }>;
@@ -30,6 +30,7 @@ const Table = ({ params }: TableProps) => {
   const [tableAddress, setTableAddress] = useState<Address>();
   const [bet, setBet] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>();
 
   useEffect(() => {
     (async () => {
@@ -55,6 +56,17 @@ const Table = ({ params }: TableProps) => {
     onError: (error) => console.log("Error", error),
   });
 
+  useWatchContractEvent({
+    address: tableAddress,
+    abi: tableAbi,
+    eventName: "BetsStarted",
+    onLogs: (logs) => {
+      console.log("Bets started", logs);
+      refetch();
+    },
+    onError: (error) => console.log("Error", error),
+  });
+
   const tableInfo = data as TableInfo;
 
   const tokenName = useMemo(() => {
@@ -63,7 +75,20 @@ const Table = ({ params }: TableProps) => {
     const pair = Object.entries(tokens).find(
       ([_, value]) => value.address == tableInfo?.token
     );
+
     return pair?.[0] ?? "ETH";
+  }, [tableInfo]);
+
+  const tokenPrecision = useMemo(() => {
+    if (!tableInfo) return null;
+
+    Object.values(tokens).forEach((token) => {
+      if (token.address == tableInfo?.token) {
+        return token.precision;
+      }
+    });
+
+    return 18;
   }, [tableInfo]);
 
   const isLastPlayerToBet = useMemo(() => {
@@ -179,7 +204,7 @@ const Table = ({ params }: TableProps) => {
                   Leave
                 </button>
               )}
-              {isCurrentUser && !gameStarted && (
+              {isCurrentUser && tableInfo.gameStatus == GameStatus.Bet && (
                 <button
                   onClick={() => {
                     refetch();
@@ -208,6 +233,11 @@ const Table = ({ params }: TableProps) => {
             </form>
           </div>
           <div className="text-xl font-semibold self-center">Place Bet</div>
+          {error && (
+            <div role="alert" className="alert alert-error mt-10">
+              <span className="text-white">{error}</span>
+            </div>
+          )}
           <div className="flex flex-col py-4 gap-4">
             <label className="flex label cursor-pointer items-between h-14">
               <span>{`Bet amount (${tokenName})`}</span>
@@ -218,6 +248,7 @@ const Table = ({ params }: TableProps) => {
                   placeholder="0"
                   className="input input-bordered w-full max-w-xs"
                   onChange={(e) => {
+                    setError(undefined);
                     setBet(+e.target.value);
                   }}
                   disabled={loading}
@@ -227,6 +258,11 @@ const Table = ({ params }: TableProps) => {
             {occupiedSeats > 1 && (
               <div>
                 {`You are currently occupying ${occupiedSeats} seats. The total bet amount sent will be ${occupiedSeats * bet} ${tokenName}`}
+              </div>
+            )}
+            {tableInfo.token !== zeroAddress && (
+              <div>
+                {`When placing your bet, you will be prompted for 2 transactions: one to approve the transfer of ${tokenName} and another to actually send the bet amount in ${tokenName}. You must first approve the transfer of ${tokenName} and then send the bet amount.`}
               </div>
             )}
             <div>
@@ -240,7 +276,57 @@ const Table = ({ params }: TableProps) => {
             type="button"
             className="btn btn-primary rounded-2xl"
             disabled={loading}
-            onClick={() => {}}
+            onClick={() => {
+              const scaledBet = bet * 10 ** (tokenPrecision ?? 18);
+
+              if (scaledBet < tableInfo.betRange.min) {
+                setError("Bet is less than minimum");
+                return;
+              }
+
+              if (scaledBet > tableInfo.betRange.max) {
+                setError("Bet is greater than maximum");
+                return;
+              }
+
+              const amount = scaledBet * occupiedSeats;
+
+              writeContract(
+                {
+                  abi: tableAbi,
+                  address: tableAddress,
+                  functionName: "placeBet",
+                  args: [amount],
+                },
+                {
+                  onError: (e) => {
+                    console.log(e);
+                  },
+                  onSuccess: () => {
+                    refetch();
+                  },
+                }
+              );
+
+              if (tableInfo.token !== zeroAddress) {
+                writeContract(
+                  {
+                    abi: erc20Abi,
+                    address: tableInfo.token,
+                    functionName: "approve",
+                    args: [tableAddress, BigInt(amount)],
+                  },
+                  {
+                    onError: (e) => {
+                      console.log(e);
+                    },
+                    onSuccess: () => {
+                      refetch();
+                    },
+                  }
+                );
+              }
+            }}
           >
             {!loading ? (
               "Place bet"

@@ -37,6 +37,11 @@ export type Rules = {
   sixToFive: boolean;
 };
 
+export type BetRange = {
+  min: number;
+  max: number;
+};
+
 export type Hand = {
   cards: number[];
   minValue: number;
@@ -59,6 +64,7 @@ export type TableInfo = {
   gameStatus: GameStatus;
   seats: SeatInfo[];
   seatCount: number;
+  betRange: BetRange;
   rules: Rules;
 };
 
