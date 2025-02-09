@@ -309,19 +309,17 @@ const Table = ({ params }: TableProps) => {
             className="btn btn-primary rounded-2xl mt-4"
             disabled={loading}
             onClick={() => {
-              const scaledBet = bet * 10 ** (tokenPrecision ?? 18);
+              const amount = bet * 10 ** (tokenPrecision ?? 18);
 
-              if (scaledBet < tableInfo.betRange.min) {
+              if (amount < tableInfo.betRange.min) {
                 setError("Bet is less than minimum");
                 return;
               }
 
-              if (scaledBet > tableInfo.betRange.max) {
+              if (amount > tableInfo.betRange.max) {
                 setError("Bet is greater than maximum");
                 return;
               }
-
-              const amount = scaledBet * occupiedSeats;
 
               if (tableInfo.token !== zeroAddress) {
                 writeContract(
@@ -329,7 +327,7 @@ const Table = ({ params }: TableProps) => {
                     abi: erc20Abi,
                     address: tableInfo.token,
                     functionName: "approve",
-                    args: [tableAddress, BigInt(amount)],
+                    args: [tableAddress, BigInt(amount * occupiedSeats)],
                   },
                   {
                     onError: (e) => {
