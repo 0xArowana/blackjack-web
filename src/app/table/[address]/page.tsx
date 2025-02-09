@@ -8,13 +8,13 @@ import {
   useWriteContract,
 } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { Close } from "../../ui/Icons";
+import { Close, WarningCircle } from "../../ui/Icons";
 import { tokens } from "../../lib/constants";
 import { tableAbi } from "../../../abi";
 import {
   Address,
   GameStatus,
-  PlayerState,
+  SeatInfo,
   TableInfo,
 } from "../../lib/definitions";
 import { erc20Abi, zeroAddress } from "viem";
@@ -108,6 +108,8 @@ const Table = ({ params }: TableProps) => {
     return currentUserMissingBet && !otherPlayerMissingBet;
   }, [tableInfo, account.address]);
 
+  console.log("table info", tableInfo);
+
   const occupiedSeats = useMemo(() => {
     let seatCount = 0;
 
@@ -129,9 +131,40 @@ const Table = ({ params }: TableProps) => {
     tableInfo.gameStatus
   );
 
+  const getSeatText = (seat: SeatInfo) => {
+    if (seat.player === zeroAddress) {
+      return isManager || gameStarted ? "EMPTY" : "SIT";
+    }
+
+    if (seat.player === account.address) {
+      return "YOU";
+    }
+
+    return "OCCUPIED";
+  };
+
   const resetBet = () => {
     document.getElementById("bet_amount").value = "";
     setBet(0);
+  };
+
+  const placeBet = (amount: number) => {
+    writeContract(
+      {
+        abi: tableAbi,
+        address: tableAddress,
+        functionName: "placeBet",
+        args: [amount],
+      },
+      {
+        onError: (e) => {
+          console.log(e);
+        },
+        onSuccess: () => {
+          refetch();
+        },
+      }
+    );
   };
 
   return (
@@ -172,13 +205,7 @@ const Table = ({ params }: TableProps) => {
                 );
               }}
             >
-              {isEmpty
-                ? isManager
-                  ? "EMPTY"
-                  : "SIT"
-                : isCurrentUser
-                  ? "YOU"
-                  : "OCCUPIED"}
+              {getSeatText(seat)}
               {isCurrentUser && !gameStarted && (
                 <button
                   onClick={() => {
@@ -238,43 +265,48 @@ const Table = ({ params }: TableProps) => {
               <span className="text-white">{error}</span>
             </div>
           )}
-          <div className="flex flex-col py-4 gap-4">
-            <label className="flex label cursor-pointer items-between h-14">
-              <span>{`Bet amount (${tokenName})`}</span>
-              <div className="flex items-center gap-2 w-64">
-                <input
-                  id="bet_amount"
-                  type="number"
-                  placeholder="0"
-                  className="input input-bordered w-full max-w-xs"
-                  onChange={(e) => {
-                    setError(undefined);
-                    setBet(+e.target.value);
-                  }}
-                  disabled={loading}
-                />
+          <div className="flex flex-col py-4 gap-8">
+            <div className="flex flex-col gap-2">
+              <div>
+                {isLastPlayerToBet && "You are the last player to place a bet."}
               </div>
+              <div>
+                {`When ${isLastPlayerToBet ? "you place your" : "the last player places their"} bet, the game will be started.`}
+              </div>
+            </div>
+            <label className="flex label cursor-pointer items-between h-14">
+              <div className="flex items-center gap-2">
+                <span>{`Bet amount (${tokenName})`}</span>
+                {tokenName !== "ETH" && (
+                  <div
+                    className="tooltip tooltip-bottom"
+                    data-tip={`Note: You will be prompted for 2 transactions: one to approve the transfer of ${tokenName} and another to actually send the deposit amount in ${tokenName}. You must first approve the transfer of ${tokenName} and then send the deposit amount.`}
+                  >
+                    <WarningCircle />
+                  </div>
+                )}
+              </div>
+              <input
+                id="bet_amount"
+                type="number"
+                placeholder="0.00"
+                className="input input-bordered w-36"
+                onChange={(e) => {
+                  setError(undefined);
+                  setBet(+e.target.value);
+                }}
+                disabled={loading}
+              />
             </label>
             {occupiedSeats > 1 && (
               <div>
-                {`You are currently occupying ${occupiedSeats} seats. The total bet amount sent will be ${occupiedSeats * bet} ${tokenName}`}
+                {`You are currently occupying ${occupiedSeats} seats. The total bet amount sent will be ${occupiedSeats * bet} ${tokenName}.`}
               </div>
             )}
-            {tableInfo.token !== zeroAddress && (
-              <div>
-                {`When placing your bet, you will be prompted for 2 transactions: one to approve the transfer of ${tokenName} and another to actually send the bet amount in ${tokenName}. You must first approve the transfer of ${tokenName} and then send the bet amount.`}
-              </div>
-            )}
-            <div>
-              When the last player places their bet, the game will be started.
-            </div>
-            <div>
-              {isLastPlayerToBet && "You are the last player to place a bet"}
-            </div>
           </div>
           <button
             type="button"
-            className="btn btn-primary rounded-2xl"
+            className="btn btn-primary rounded-2xl mt-4"
             disabled={loading}
             onClick={() => {
               const scaledBet = bet * 10 ** (tokenPrecision ?? 18);
@@ -291,23 +323,6 @@ const Table = ({ params }: TableProps) => {
 
               const amount = scaledBet * occupiedSeats;
 
-              writeContract(
-                {
-                  abi: tableAbi,
-                  address: tableAddress,
-                  functionName: "placeBet",
-                  args: [amount],
-                },
-                {
-                  onError: (e) => {
-                    console.log(e);
-                  },
-                  onSuccess: () => {
-                    refetch();
-                  },
-                }
-              );
-
               if (tableInfo.token !== zeroAddress) {
                 writeContract(
                   {
@@ -321,10 +336,12 @@ const Table = ({ params }: TableProps) => {
                       console.log(e);
                     },
                     onSuccess: () => {
-                      refetch();
+                      placeBet(amount);
                     },
                   }
                 );
+              } else {
+                placeBet(amount);
               }
             }}
           >

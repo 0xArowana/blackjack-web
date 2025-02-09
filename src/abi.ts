@@ -305,6 +305,62 @@ export const pitAbi = [
               },
             ],
           },
+          {
+            name: "lockTimestamp",
+            type: "uint256",
+            internalType: "uint256",
+          },
+        ],
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getManagerTokenInfo",
+    inputs: [
+      {
+        name: "_manager",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "tuple[]",
+        internalType: "struct Pit.TokenInfo[]",
+        components: [
+          {
+            name: "id",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "symbol",
+            type: "string",
+            internalType: "string",
+          },
+          {
+            name: "name",
+            type: "string",
+            internalType: "string",
+          },
+          {
+            name: "decimals",
+            type: "uint8",
+            internalType: "uint8",
+          },
+          {
+            name: "balance",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "maxPayout",
+            type: "uint256",
+            internalType: "uint256",
+          },
         ],
       },
     ],
@@ -446,6 +502,11 @@ export const pitAbi = [
                 internalType: "bool",
               },
             ],
+          },
+          {
+            name: "lockTimestamp",
+            type: "uint256",
+            internalType: "uint256",
           },
         ],
       },

@@ -66,6 +66,7 @@ export type TableInfo = {
   seatCount: number;
   betRange: BetRange;
   rules: Rules;
+  lockTimestamp: number;
 };
 
 export type SeatInfo = {

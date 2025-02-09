@@ -71,7 +71,6 @@ const App = () => {
           <div>Please connect your wallet</div>
         )}
       </div>
-      <CreateTableModal />
     </>
   );
 };
