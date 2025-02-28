@@ -4,9 +4,21 @@ export enum DoubleRule {
   TenToEleven,
 }
 
-export type Token = {
-  address: string;
-  precision: number;
+export type TokenInfo = {
+  id: Address;
+  symbol: string;
+  name: string;
+  decimals: number;
+};
+
+export type TokenState = {
+  balance: number;
+  allocated: number;
+};
+
+export type ManagerToken = {
+  info: TokenInfo;
+  state: TokenState;
 };
 
 export enum GameStatus {
@@ -60,7 +72,7 @@ export type PlayerState = {
 export type TableInfo = {
   id: Address;
   manager: Address;
-  token: Address;
+  tokenInfo: TokenInfo;
   gameStatus: GameStatus;
   seats: SeatInfo[];
   seatCount: number;

@@ -8,7 +8,7 @@ const Sidebar: FC<{ children: ReactNode | ReactNode[] }> = ({ children }) => {
   return (
     <div className="drawer lg:drawer-open">
       <input type="checkbox" className="drawer-toggle" />
-      <div className="drawer-content flex flex-col items-center py-32">
+      <div className="drawer-content flex flex-col items-center">
         {children}
       </div>
       <div className="drawer-side flex">

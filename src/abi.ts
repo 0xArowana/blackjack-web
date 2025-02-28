@@ -5,6 +5,10 @@ export const pitAbi = [
     stateMutability: "nonpayable",
   },
   {
+    type: "receive",
+    stateMutability: "payable",
+  },
+  {
     type: "function",
     name: "UPGRADE_INTERFACE_VERSION",
     inputs: [],
@@ -16,6 +20,31 @@ export const pitAbi = [
       },
     ],
     stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "acceptOwnership",
+    inputs: [],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "allocate",
+    inputs: [
+      {
+        name: "_amount",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "_token",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
     type: "function",
@@ -52,6 +81,11 @@ export const pitAbi = [
             name: "deckCount",
             type: "uint8",
             internalType: "uint8",
+          },
+          {
+            name: "deckReset",
+            type: "uint8",
+            internalType: "enum Table.DeckReset",
           },
           {
             name: "dealerHitOnSoft17",
@@ -111,24 +145,6 @@ export const pitAbi = [
   },
   {
     type: "function",
-    name: "decreaseMaxPayout",
-    inputs: [
-      {
-        name: "_amount",
-        type: "uint256",
-        internalType: "uint256",
-      },
-      {
-        name: "_token",
-        type: "address",
-        internalType: "address",
-      },
-    ],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
     name: "deposit",
     inputs: [
       {
@@ -160,7 +176,7 @@ export const pitAbi = [
         internalType: "int256",
       },
       {
-        name: "_gameMaxPayout",
+        name: "_gameAllocation",
         type: "uint256",
         internalType: "uint256",
       },
@@ -195,9 +211,31 @@ export const pitAbi = [
             internalType: "address",
           },
           {
-            name: "token",
-            type: "address",
-            internalType: "address",
+            name: "tokenInfo",
+            type: "tuple",
+            internalType: "struct Pit.TokenInfo",
+            components: [
+              {
+                name: "id",
+                type: "address",
+                internalType: "address",
+              },
+              {
+                name: "symbol",
+                type: "string",
+                internalType: "string",
+              },
+              {
+                name: "name",
+                type: "string",
+                internalType: "string",
+              },
+              {
+                name: "decimals",
+                type: "uint8",
+                internalType: "uint8",
+              },
+            ],
           },
           {
             name: "gameStatus",
@@ -259,6 +297,11 @@ export const pitAbi = [
                 internalType: "uint8",
               },
               {
+                name: "deckReset",
+                type: "uint8",
+                internalType: "enum Table.DeckReset",
+              },
+              {
                 name: "dealerHitOnSoft17",
                 type: "bool",
                 internalType: "bool",
@@ -317,7 +360,7 @@ export const pitAbi = [
   },
   {
     type: "function",
-    name: "getManagerTokenInfo",
+    name: "getManagerTokens",
     inputs: [
       {
         name: "_manager",
@@ -329,37 +372,51 @@ export const pitAbi = [
       {
         name: "",
         type: "tuple[]",
-        internalType: "struct Pit.TokenInfo[]",
+        internalType: "struct Pit.ManagerToken[]",
         components: [
           {
-            name: "id",
-            type: "address",
-            internalType: "address",
+            name: "info",
+            type: "tuple",
+            internalType: "struct Pit.TokenInfo",
+            components: [
+              {
+                name: "id",
+                type: "address",
+                internalType: "address",
+              },
+              {
+                name: "symbol",
+                type: "string",
+                internalType: "string",
+              },
+              {
+                name: "name",
+                type: "string",
+                internalType: "string",
+              },
+              {
+                name: "decimals",
+                type: "uint8",
+                internalType: "uint8",
+              },
+            ],
           },
           {
-            name: "symbol",
-            type: "string",
-            internalType: "string",
-          },
-          {
-            name: "name",
-            type: "string",
-            internalType: "string",
-          },
-          {
-            name: "decimals",
-            type: "uint8",
-            internalType: "uint8",
-          },
-          {
-            name: "balance",
-            type: "uint256",
-            internalType: "uint256",
-          },
-          {
-            name: "maxPayout",
-            type: "uint256",
-            internalType: "uint256",
+            name: "state",
+            type: "tuple",
+            internalType: "struct Pit.TokenState",
+            components: [
+              {
+                name: "balance",
+                type: "uint256",
+                internalType: "uint256",
+              },
+              {
+                name: "allocated",
+                type: "uint256",
+                internalType: "uint256",
+              },
+            ],
           },
         ],
       },
@@ -393,9 +450,31 @@ export const pitAbi = [
             internalType: "address",
           },
           {
-            name: "token",
-            type: "address",
-            internalType: "address",
+            name: "tokenInfo",
+            type: "tuple",
+            internalType: "struct Pit.TokenInfo",
+            components: [
+              {
+                name: "id",
+                type: "address",
+                internalType: "address",
+              },
+              {
+                name: "symbol",
+                type: "string",
+                internalType: "string",
+              },
+              {
+                name: "name",
+                type: "string",
+                internalType: "string",
+              },
+              {
+                name: "decimals",
+                type: "uint8",
+                internalType: "uint8",
+              },
+            ],
           },
           {
             name: "gameStatus",
@@ -457,6 +536,11 @@ export const pitAbi = [
                 internalType: "uint8",
               },
               {
+                name: "deckReset",
+                type: "uint8",
+                internalType: "enum Table.DeckReset",
+              },
+              {
                 name: "dealerHitOnSoft17",
                 type: "bool",
                 internalType: "bool",
@@ -512,24 +596,6 @@ export const pitAbi = [
       },
     ],
     stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "increaseMaxPayout",
-    inputs: [
-      {
-        name: "_amount",
-        type: "uint256",
-        internalType: "uint256",
-      },
-      {
-        name: "_token",
-        type: "address",
-        internalType: "address",
-      },
-    ],
-    outputs: [],
-    stateMutability: "nonpayable",
   },
   {
     type: "function",
@@ -658,15 +724,14 @@ export const pitAbi = [
   },
   {
     type: "function",
-    name: "renounceOwnership",
-    inputs: [],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
     name: "requestRandomWords",
-    inputs: [],
+    inputs: [
+      {
+        name: "_numWords",
+        type: "uint32",
+        internalType: "uint32",
+      },
+    ],
     outputs: [],
     stateMutability: "nonpayable",
   },
@@ -716,7 +781,7 @@ export const pitAbi = [
         internalType: "uint256",
       },
       {
-        name: "maxPayout",
+        name: "allocated",
         type: "uint256",
         internalType: "uint256",
       },
@@ -776,6 +841,19 @@ export const pitAbi = [
   },
   {
     type: "function",
+    name: "s_vrfCoordinator",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "contract IVRFCoordinatorV2Plus",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "s_vrfRequests",
     inputs: [
       {
@@ -792,6 +870,19 @@ export const pitAbi = [
       },
     ],
     stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "setCoordinator",
+    inputs: [
+      {
+        name: "_vrfCoordinator",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
     type: "function",
@@ -824,7 +915,7 @@ export const pitAbi = [
     name: "transferOwnership",
     inputs: [
       {
-        name: "newOwner",
+        name: "to",
         type: "address",
         internalType: "address",
       },
@@ -852,6 +943,19 @@ export const pitAbi = [
   },
   {
     type: "event",
+    name: "CoordinatorSet",
+    inputs: [
+      {
+        name: "vrfCoordinator",
+        type: "address",
+        indexed: false,
+        internalType: "address",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
     name: "Initialized",
     inputs: [
       {
@@ -865,16 +969,35 @@ export const pitAbi = [
   },
   {
     type: "event",
-    name: "OwnershipTransferred",
+    name: "OwnershipTransferRequested",
     inputs: [
       {
-        name: "previousOwner",
+        name: "from",
         type: "address",
         indexed: true,
         internalType: "address",
       },
       {
-        name: "newOwner",
+        name: "to",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "OwnershipTransferred",
+    inputs: [
+      {
+        name: "from",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "to",
         type: "address",
         indexed: true,
         internalType: "address",
@@ -1016,21 +1139,20 @@ export const pitAbi = [
   },
   {
     type: "error",
-    name: "OwnableInvalidOwner",
+    name: "OnlyOwnerOrCoordinator",
     inputs: [
+      {
+        name: "have",
+        type: "address",
+        internalType: "address",
+      },
       {
         name: "owner",
         type: "address",
         internalType: "address",
       },
-    ],
-  },
-  {
-    type: "error",
-    name: "OwnableUnauthorizedAccount",
-    inputs: [
       {
-        name: "account",
+        name: "coordinator",
         type: "address",
         internalType: "address",
       },
@@ -1102,6 +1224,11 @@ export const pitAbi = [
       },
     ],
   },
+  {
+    type: "error",
+    name: "ZeroAddress",
+    inputs: [],
+  },
 ];
 
 export const tableAbi = [
@@ -1133,6 +1260,19 @@ export const tableAbi = [
   },
   {
     type: "function",
+    name: "fulfillRandomWords",
+    inputs: [
+      {
+        name: "_randomWords",
+        type: "uint256[]",
+        internalType: "uint256[]",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
     name: "getTableInfo",
     inputs: [],
     outputs: [
@@ -1152,9 +1292,31 @@ export const tableAbi = [
             internalType: "address",
           },
           {
-            name: "token",
-            type: "address",
-            internalType: "address",
+            name: "tokenInfo",
+            type: "tuple",
+            internalType: "struct Pit.TokenInfo",
+            components: [
+              {
+                name: "id",
+                type: "address",
+                internalType: "address",
+              },
+              {
+                name: "symbol",
+                type: "string",
+                internalType: "string",
+              },
+              {
+                name: "name",
+                type: "string",
+                internalType: "string",
+              },
+              {
+                name: "decimals",
+                type: "uint8",
+                internalType: "uint8",
+              },
+            ],
           },
           {
             name: "gameStatus",
@@ -1216,6 +1378,11 @@ export const tableAbi = [
                 internalType: "uint8",
               },
               {
+                name: "deckReset",
+                type: "uint8",
+                internalType: "enum Table.DeckReset",
+              },
+              {
                 name: "dealerHitOnSoft17",
                 type: "bool",
                 internalType: "bool",
@@ -1262,17 +1429,15 @@ export const tableAbi = [
               },
             ],
           },
+          {
+            name: "lockTimestamp",
+            type: "uint256",
+            internalType: "uint256",
+          },
         ],
       },
     ],
     stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "hit",
-    inputs: [],
-    outputs: [],
-    stateMutability: "nonpayable",
   },
   {
     type: "function",
@@ -1314,6 +1479,11 @@ export const tableAbi = [
             name: "deckCount",
             type: "uint8",
             internalType: "uint8",
+          },
+          {
+            name: "deckReset",
+            type: "uint8",
+            internalType: "enum Table.DeckReset",
           },
           {
             name: "dealerHitOnSoft17",
@@ -1426,6 +1596,20 @@ export const tableAbi = [
   },
   {
     type: "function",
+    name: "requestHit",
+    inputs: [],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "requestSplit",
+    inputs: [],
+    outputs: [],
+    stateMutability: "payable",
+  },
+  {
+    type: "function",
     name: "s_gameStatus",
     inputs: [],
     outputs: [
@@ -1503,19 +1687,6 @@ export const tableAbi = [
   },
   {
     type: "function",
-    name: "setRandomWords",
-    inputs: [
-      {
-        name: "_randomWords",
-        type: "uint256[]",
-        internalType: "uint256[]",
-      },
-    ],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
     name: "setSeatCount",
     inputs: [
       {
@@ -1552,13 +1723,6 @@ export const tableAbi = [
     ],
     outputs: [],
     stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    name: "split",
-    inputs: [],
-    outputs: [],
-    stateMutability: "payable",
   },
   {
     type: "function",
@@ -1621,7 +1785,26 @@ export const tableAbi = [
   },
   {
     type: "event",
+    name: "CardDrawn",
+    inputs: [
+      {
+        name: "card",
+        type: "uint8",
+        indexed: true,
+        internalType: "uint8",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
     name: "GameStarted",
+    inputs: [],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "HandSet",
     inputs: [],
     anonymous: false,
   },
@@ -1710,7 +1893,26 @@ export const tableAbi = [
   },
   {
     type: "event",
+    name: "RandomWordsFulfilled",
+    inputs: [
+      {
+        name: "drawRequest",
+        type: "uint8",
+        indexed: true,
+        internalType: "enum Table.DrawRequest",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
     name: "TableLocked",
+    inputs: [],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "WillCreateHand",
     inputs: [],
     anonymous: false,
   },
@@ -1808,6 +2010,11 @@ export const tableAbi = [
   },
   {
     type: "error",
+    name: "Table__InsufficientManagerBalance",
+    inputs: [],
+  },
+  {
+    type: "error",
     name: "Table__InvalidBetAmount",
     inputs: [],
   },
@@ -1819,6 +2026,11 @@ export const tableAbi = [
   {
     type: "error",
     name: "Table__InvalidDeckCount",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "Table__InvalidDeckReset",
     inputs: [],
   },
   {

@@ -8,9 +8,8 @@ import {
 } from "wagmi";
 import { pitAbi } from "../abi";
 import { useEffect, useState } from "react";
-import { ContractFunctionParameters, zeroAddress } from "viem";
-import { pitAddress, tokens } from "./lib/constants";
-import CreateTableModal from "./ui/CreateTableModal";
+import { zeroAddress } from "viem";
+import { pitAddress } from "./lib/constants";
 import { TableInfo } from "./lib/definitions";
 
 const App = () => {
@@ -24,19 +23,11 @@ const App = () => {
     args: [account.address],
   });
 
-  const getTokenName = (address: string) => {
-    const pair = Object.entries(tokens).find(
-      ([_, value]) => value.address == address
-    );
-    return pair?.[0] ?? "ETH";
-  };
-
   useEffect(() => {
     refetch();
   }, [account.address]);
 
   const table = data as TableInfo;
-
   const players = table?.seats.filter((s) => s.player !== zeroAddress);
 
   return (
@@ -60,7 +51,7 @@ const App = () => {
                     >
                       <div className="truncate">{table.id}</div>
                     </div>
-                    <div>{`Token = ${getTokenName(table.token)}`}</div>
+                    <div>{`Token = ${table.token.symbol}`}</div>
                     <div>{`Players = ${players.length}/${table.seats.length}`}</div>
                   </a>
                 </div>

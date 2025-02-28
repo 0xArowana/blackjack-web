@@ -9,11 +9,13 @@ import {
 } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { Close, WarningCircle } from "../../ui/Icons";
-import { tokens } from "../../lib/constants";
+import { pitInfo, tokens } from "../../lib/constants";
+import Image from "next/image";
 import { tableAbi } from "../../../abi";
 import {
   Address,
   GameStatus,
+  ManagerToken,
   SeatInfo,
   TableInfo,
 } from "../../lib/definitions";
@@ -39,11 +41,13 @@ const Table = ({ params }: TableProps) => {
     })();
   }, []);
 
-  const { data, refetch } = useReadContract({
+  const { data: tableData, refetch } = useReadContract({
     address: tableAddress,
     abi: tableAbi,
     functionName: "getTableInfo",
   });
+
+  const table = tableData as TableInfo;
 
   useWatchContractEvent({
     address: tableAddress,
@@ -67,35 +71,11 @@ const Table = ({ params }: TableProps) => {
     onError: (error) => console.log("Error", error),
   });
 
-  const tableInfo = data as TableInfo;
-
-  const tokenName = useMemo(() => {
-    if (!tableInfo) return null;
-
-    const pair = Object.entries(tokens).find(
-      ([_, value]) => value.address == tableInfo?.token
-    );
-
-    return pair?.[0] ?? "ETH";
-  }, [tableInfo]);
-
-  const tokenPrecision = useMemo(() => {
-    if (!tableInfo) return null;
-
-    Object.values(tokens).forEach((token) => {
-      if (token.address == tableInfo?.token) {
-        return token.precision;
-      }
-    });
-
-    return 18;
-  }, [tableInfo]);
-
   const isLastPlayerToBet = useMemo(() => {
     let currentUserMissingBet = false;
     let otherPlayerMissingBet = false;
 
-    tableInfo?.seats.forEach((seat) => {
+    table?.seats.forEach((seat) => {
       const missingBet = Number(seat.bet) === 0;
 
       if (seat.player === account.address && missingBet) {
@@ -106,29 +86,27 @@ const Table = ({ params }: TableProps) => {
     });
 
     return currentUserMissingBet && !otherPlayerMissingBet;
-  }, [tableInfo, account.address]);
-
-  console.log("table info", tableInfo);
+  }, [table, account.address]);
 
   const occupiedSeats = useMemo(() => {
     let seatCount = 0;
 
-    tableInfo?.seats.forEach((seat) => {
+    table?.seats.forEach((seat) => {
       if (seat.player === account.address) {
         seatCount++;
       }
     });
 
     return seatCount;
-  }, [tableInfo, account.address]);
+  }, [table, account.address]);
 
-  if (!tableAddress || !tableInfo) {
+  if (!tableAddress || !table) {
     return <div className="loading loading-spinner loading-lg h-full"></div>;
   }
 
-  const isManager = tableInfo.manager === account.address;
+  const isManager = table.manager === account.address;
   const gameStarted = ![GameStatus.Bet, GameStatus.Inactive].includes(
-    tableInfo.gameStatus
+    table.gameStatus
   );
 
   const getSeatText = (seat: SeatInfo) => {
@@ -167,81 +145,128 @@ const Table = ({ params }: TableProps) => {
     );
   };
 
+  console.log("TABLE", table);
+
+  if (!table) {
+    return (
+      <>
+        <span className="loading loading-spinner loading-lg" />
+        <div>Connecting...</div>
+      </>
+    );
+  }
+
+  const seatCount = table.seats.length;
+
   return (
-    <div>
-      <div className="flex flex-row gap-4 mt-10">
-        {tableInfo.seats.map((seat, index) => {
+    <div
+      className="flex flex-col h-full w-full py-48 items-center justify-between"
+      style={{ background: "radial-gradient(#4ea851, #295d2d)" }}
+    >
+      <div
+        className="flex justify-center items-center flex-col p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800"
+        style={{ height: 140, width: 100 }}
+      >
+        DEALER
+      </div>
+      <div className="flex flex-row" style={{ gap: 200 / seatCount }}>
+        {table.seats.map((seat, index) => {
           const isEmpty = seat.player === zeroAddress;
           const isCurrentUser = seat.player === account.address;
           const canSit = !isManager && isEmpty && !gameStarted;
 
+          const rotation = 20 - (40 / (seatCount - 1)) * index;
+
           return (
             <div
-              className={`flex flex-col p-6 bg-white border border-gray-200 rounded-lg shadow ${canSit ? `hover:bg-gray-100 dark:bg-gray-800 cursor-pointer` : ""} gap-2`}
-              key={`table-spot-${index}`}
-              onClick={() => {
-                if (!canSit) return;
-
-                if (!account.address) {
-                  openConnectModal?.();
-                  return;
-                }
-
-                writeContract(
-                  {
-                    abi: tableAbi,
-                    address: tableAddress,
-                    functionName: "sit",
-                    args: [index],
-                  },
-                  {
-                    onError: (e) => {
-                      console.log(e);
-                    },
-                    onSuccess: () => {
-                      refetch();
-                    },
-                  }
-                );
+              style={{
+                transform: `rotate(${rotation}deg)`,
+                marginTop:
+                  (seatCount * -Math.abs(rotation ** 2)) / Math.PI / 13,
               }}
             >
-              {getSeatText(seat)}
-              {isCurrentUser && !gameStarted && (
-                <button
-                  onClick={() => {
-                    writeContract(
-                      {
-                        abi: tableAbi,
-                        address: tableAddress,
-                        functionName: "leave",
-                        args: [index],
+              <div
+                className={`flex justify-center items-center flex-col p-6 ${canSit ? `dark:bg-gray-800 cursor-pointer` : ""} gap-2`}
+                key={`table-spot-${index}`}
+                onClick={() => {
+                  if (!canSit) return;
+
+                  if (!account.address) {
+                    openConnectModal?.();
+                    return;
+                  }
+
+                  writeContract(
+                    {
+                      abi: tableAbi,
+                      address: tableAddress,
+                      functionName: "sit",
+                      args: [index],
+                    },
+                    {
+                      onError: (e) => {
+                        console.log(e);
                       },
-                      {
-                        onError: (e) => {
-                          console.log(e);
+                      onSuccess: () => {
+                        refetch();
+                      },
+                    }
+                  );
+                }}
+              >
+                <Image
+                  src={`/card${index + 7}.svg`}
+                  alt={`card${index + 7}`}
+                  width={100}
+                  height={140}
+                  className="shadow-md z-10"
+                />
+                <Image
+                  src={`/card${index + 15}.svg`}
+                  alt={`card${index + 15}`}
+                  width={100}
+                  height={140}
+                  className="shadow-md"
+                  style={{ marginTop: -130, marginLeft: 60 }}
+                />
+                {getSeatText(seat)}
+                {isCurrentUser && !gameStarted && (
+                  <button
+                    onClick={() => {
+                      writeContract(
+                        {
+                          abi: tableAbi,
+                          address: tableAddress,
+                          functionName: "leave",
+                          args: [index],
                         },
-                        onSuccess: () => {
-                          refetch();
-                        },
-                      }
-                    );
-                  }}
-                  className="btn"
-                >
-                  Leave
-                </button>
-              )}
-              {isCurrentUser && tableInfo.gameStatus == GameStatus.Bet && (
-                <button
-                  onClick={() => {
-                    refetch();
-                    document.getElementById("bet_modal")?.showModal();
-                  }}
-                  className="btn"
-                >
-                  Place Bet
-                </button>
-              )}
+                        {
+                          onError: (e) => {
+                            console.log(e);
+                          },
+                          onSuccess: () => {
+                            refetch();
+                          },
+                        }
+                      );
+                    }}
+                    className="btn"
+                  >
+                    Leave
+                  </button>
+                )}
+                {isCurrentUser && table.gameStatus == GameStatus.Bet && (
+                  <button
+                    onClick={() => {
+                      refetch();
+                      document.getElementById("bet_modal")?.showModal();
+                    }}
+                    className="btn"
+                  >
+                    Place Bet
+                  </button>
+                )}
+              </div>
             </div>
           );
         })}
@@ -276,11 +301,11 @@ const Table = ({ params }: TableProps) => {
             </div>
             <label className="flex label cursor-pointer items-between h-14">
               <div className="flex items-center gap-2">
-                <span>{`Bet amount (${tokenName})`}</span>
-                {tokenName !== "ETH" && (
+                <span>{`Bet amount (${table.tokenInfo.symbol})`}</span>
+                {table.tokenInfo.symbol !== "ETH" && (
                   <div
                     className="tooltip tooltip-bottom"
-                    data-tip={`Note: You will be prompted for 2 transactions: one to approve the transfer of ${tokenName} and another to actually send the deposit amount in ${tokenName}. You must first approve the transfer of ${tokenName} and then send the deposit amount.`}
+                    data-tip={`Note: You will be prompted for 2 transactions: one to approve the transfer of ${table.tokenInfo.symbol} and another to actually send the deposit amount in ${table.tokenInfo.symbol}. You must first approve the transfer of ${table.tokenInfo.symbol} and then send the deposit amount.`}
                   >
                     <WarningCircle />
                   </div>
@@ -300,7 +325,7 @@ const Table = ({ params }: TableProps) => {
             </label>
             {occupiedSeats > 1 && (
               <div>
-                {`You are currently occupying ${occupiedSeats} seats. The total bet amount sent will be ${occupiedSeats * bet} ${tokenName}.`}
+                {`You are currently occupying ${occupiedSeats} seats. The total bet amount sent will be ${occupiedSeats * bet} ${table.tokenInfo.symbol}.`}
               </div>
             )}
           </div>
@@ -309,23 +334,23 @@ const Table = ({ params }: TableProps) => {
             className="btn btn-primary rounded-2xl mt-4"
             disabled={loading}
             onClick={() => {
-              const amount = bet * 10 ** (tokenPrecision ?? 18);
+              const amount = bet * 10 ** table.tokenInfo.decimals;
 
-              if (amount < tableInfo.betRange.min) {
+              if (amount < table.betRange.min) {
                 setError("Bet is less than minimum");
                 return;
               }
 
-              if (amount > tableInfo.betRange.max) {
+              if (amount > table.betRange.max) {
                 setError("Bet is greater than maximum");
                 return;
               }
 
-              if (tableInfo.token !== zeroAddress) {
+              if (table.tokenInfo.id !== zeroAddress) {
                 writeContract(
                   {
                     abi: erc20Abi,
-                    address: tableInfo.token,
+                    address: table.tokenInfo.id,
                     functionName: "approve",
                     args: [tableAddress, BigInt(amount * occupiedSeats)],
                   },

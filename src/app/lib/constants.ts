@@ -1,10 +1,4 @@
-import { Token } from "./definitions";
+import { pitAbi } from "@/abi";
 
-export const pitAddress = "0xB8204Bd79f34F4397c998281Bbb827c46E6d6B40";
-
-export const tokens: { [key: string]: Token } = {
-  TST: {
-    address: "0xeC12Ffe943b53DF4884A55b14168553d43eA28c7",
-    precision: 18,
-  },
-};
+export const pitAddress = "0x8C34303C98cf94b2A332293E0888DFaF9C8ddAec";
+export const pitInfo: any = { address: pitAddress, abi: pitAbi };
