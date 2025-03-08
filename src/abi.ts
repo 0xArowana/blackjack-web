@@ -58,7 +58,7 @@ export const pitAbi = [
       {
         name: "_betRange",
         type: "tuple",
-        internalType: "struct Table.BetRange",
+        internalType: "struct ITable.BetRange",
         components: [
           {
             name: "min",
@@ -75,7 +75,7 @@ export const pitAbi = [
       {
         name: "_rules",
         type: "tuple",
-        internalType: "struct Table.Rules",
+        internalType: "struct ITable.Rules",
         components: [
           {
             name: "deckCount",
@@ -85,7 +85,7 @@ export const pitAbi = [
           {
             name: "deckReset",
             type: "uint8",
-            internalType: "enum Table.DeckReset",
+            internalType: "enum ITable.DeckReset",
           },
           {
             name: "dealerHitOnSoft17",
@@ -100,7 +100,7 @@ export const pitAbi = [
           {
             name: "doubleRule",
             type: "uint8",
-            internalType: "enum Table.DoubleRule",
+            internalType: "enum ITable.DoubleRule",
           },
           {
             name: "maxResplitHands",
@@ -198,7 +198,7 @@ export const pitAbi = [
       {
         name: "",
         type: "tuple[]",
-        internalType: "struct Table.TableInfo[]",
+        internalType: "struct ITable.TableInfo[]",
         components: [
           {
             name: "id",
@@ -213,7 +213,7 @@ export const pitAbi = [
           {
             name: "tokenInfo",
             type: "tuple",
-            internalType: "struct Pit.TokenInfo",
+            internalType: "struct IPit.TokenInfo",
             components: [
               {
                 name: "id",
@@ -240,12 +240,12 @@ export const pitAbi = [
           {
             name: "gameStatus",
             type: "uint8",
-            internalType: "enum Table.GameStatus",
+            internalType: "enum ITable.GameStatus",
           },
           {
             name: "seats",
             type: "tuple[]",
-            internalType: "struct Table.SeatInfo[]",
+            internalType: "struct ITable.SeatInfo[]",
             components: [
               {
                 name: "player",
@@ -272,7 +272,7 @@ export const pitAbi = [
           {
             name: "betRange",
             type: "tuple",
-            internalType: "struct Table.BetRange",
+            internalType: "struct ITable.BetRange",
             components: [
               {
                 name: "min",
@@ -289,7 +289,7 @@ export const pitAbi = [
           {
             name: "rules",
             type: "tuple",
-            internalType: "struct Table.Rules",
+            internalType: "struct ITable.Rules",
             components: [
               {
                 name: "deckCount",
@@ -299,7 +299,7 @@ export const pitAbi = [
               {
                 name: "deckReset",
                 type: "uint8",
-                internalType: "enum Table.DeckReset",
+                internalType: "enum ITable.DeckReset",
               },
               {
                 name: "dealerHitOnSoft17",
@@ -314,7 +314,7 @@ export const pitAbi = [
               {
                 name: "doubleRule",
                 type: "uint8",
-                internalType: "enum Table.DoubleRule",
+                internalType: "enum ITable.DoubleRule",
               },
               {
                 name: "maxResplitHands",
@@ -360,6 +360,42 @@ export const pitAbi = [
   },
   {
     type: "function",
+    name: "getManagerTokenState",
+    inputs: [
+      {
+        name: "_manager",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "_token",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "tuple",
+        internalType: "struct IPit.TokenState",
+        components: [
+          {
+            name: "balance",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "allocated",
+            type: "uint256",
+            internalType: "uint256",
+          },
+        ],
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "getManagerTokens",
     inputs: [
       {
@@ -377,7 +413,7 @@ export const pitAbi = [
           {
             name: "info",
             type: "tuple",
-            internalType: "struct Pit.TokenInfo",
+            internalType: "struct IPit.TokenInfo",
             components: [
               {
                 name: "id",
@@ -404,7 +440,7 @@ export const pitAbi = [
           {
             name: "state",
             type: "tuple",
-            internalType: "struct Pit.TokenState",
+            internalType: "struct IPit.TokenState",
             components: [
               {
                 name: "balance",
@@ -425,6 +461,25 @@ export const pitAbi = [
   },
   {
     type: "function",
+    name: "getPlayerTable",
+    inputs: [
+      {
+        name: "_player",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "getPlayerTableInfo",
     inputs: [
       {
@@ -437,7 +492,7 @@ export const pitAbi = [
       {
         name: "",
         type: "tuple",
-        internalType: "struct Table.TableInfo",
+        internalType: "struct ITable.TableInfo",
         components: [
           {
             name: "id",
@@ -452,7 +507,7 @@ export const pitAbi = [
           {
             name: "tokenInfo",
             type: "tuple",
-            internalType: "struct Pit.TokenInfo",
+            internalType: "struct IPit.TokenInfo",
             components: [
               {
                 name: "id",
@@ -479,12 +534,12 @@ export const pitAbi = [
           {
             name: "gameStatus",
             type: "uint8",
-            internalType: "enum Table.GameStatus",
+            internalType: "enum ITable.GameStatus",
           },
           {
             name: "seats",
             type: "tuple[]",
-            internalType: "struct Table.SeatInfo[]",
+            internalType: "struct ITable.SeatInfo[]",
             components: [
               {
                 name: "player",
@@ -511,7 +566,7 @@ export const pitAbi = [
           {
             name: "betRange",
             type: "tuple",
-            internalType: "struct Table.BetRange",
+            internalType: "struct ITable.BetRange",
             components: [
               {
                 name: "min",
@@ -528,7 +583,7 @@ export const pitAbi = [
           {
             name: "rules",
             type: "tuple",
-            internalType: "struct Table.Rules",
+            internalType: "struct ITable.Rules",
             components: [
               {
                 name: "deckCount",
@@ -538,7 +593,7 @@ export const pitAbi = [
               {
                 name: "deckReset",
                 type: "uint8",
-                internalType: "enum Table.DeckReset",
+                internalType: "enum ITable.DeckReset",
               },
               {
                 name: "dealerHitOnSoft17",
@@ -553,7 +608,7 @@ export const pitAbi = [
               {
                 name: "doubleRule",
                 type: "uint8",
-                internalType: "enum Table.DoubleRule",
+                internalType: "enum ITable.DoubleRule",
               },
               {
                 name: "maxResplitHands",
@@ -1044,7 +1099,7 @@ export const pitAbi = [
         name: "betRange",
         type: "tuple",
         indexed: false,
-        internalType: "struct Table.BetRange",
+        internalType: "struct ITable.BetRange",
         components: [
           {
             name: "min",
@@ -1273,13 +1328,82 @@ export const tableAbi = [
   },
   {
     type: "function",
+    name: "getSeats",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "tuple[]",
+        internalType: "struct Table.Seat[]",
+        components: [
+          {
+            name: "info",
+            type: "tuple",
+            internalType: "struct ITable.SeatInfo",
+            components: [
+              {
+                name: "player",
+                type: "address",
+                internalType: "address",
+              },
+              {
+                name: "bet",
+                type: "uint256",
+                internalType: "uint256",
+              },
+              {
+                name: "waiting",
+                type: "bool",
+                internalType: "bool",
+              },
+            ],
+          },
+          {
+            name: "hands",
+            type: "tuple[]",
+            internalType: "struct Table.Hand[]",
+            components: [
+              {
+                name: "cards",
+                type: "uint8[]",
+                internalType: "uint8[]",
+              },
+              {
+                name: "minValue",
+                type: "uint8",
+                internalType: "uint8",
+              },
+              {
+                name: "aceCount",
+                type: "uint8",
+                internalType: "uint8",
+              },
+              {
+                name: "status",
+                type: "uint8",
+                internalType: "enum Table.HandStatus",
+              },
+              {
+                name: "doubled",
+                type: "bool",
+                internalType: "bool",
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "getTableInfo",
     inputs: [],
     outputs: [
       {
         name: "",
         type: "tuple",
-        internalType: "struct Table.TableInfo",
+        internalType: "struct ITable.TableInfo",
         components: [
           {
             name: "id",
@@ -1294,7 +1418,7 @@ export const tableAbi = [
           {
             name: "tokenInfo",
             type: "tuple",
-            internalType: "struct Pit.TokenInfo",
+            internalType: "struct IPit.TokenInfo",
             components: [
               {
                 name: "id",
@@ -1321,12 +1445,12 @@ export const tableAbi = [
           {
             name: "gameStatus",
             type: "uint8",
-            internalType: "enum Table.GameStatus",
+            internalType: "enum ITable.GameStatus",
           },
           {
             name: "seats",
             type: "tuple[]",
-            internalType: "struct Table.SeatInfo[]",
+            internalType: "struct ITable.SeatInfo[]",
             components: [
               {
                 name: "player",
@@ -1353,7 +1477,7 @@ export const tableAbi = [
           {
             name: "betRange",
             type: "tuple",
-            internalType: "struct Table.BetRange",
+            internalType: "struct ITable.BetRange",
             components: [
               {
                 name: "min",
@@ -1370,7 +1494,7 @@ export const tableAbi = [
           {
             name: "rules",
             type: "tuple",
-            internalType: "struct Table.Rules",
+            internalType: "struct ITable.Rules",
             components: [
               {
                 name: "deckCount",
@@ -1380,7 +1504,7 @@ export const tableAbi = [
               {
                 name: "deckReset",
                 type: "uint8",
-                internalType: "enum Table.DeckReset",
+                internalType: "enum ITable.DeckReset",
               },
               {
                 name: "dealerHitOnSoft17",
@@ -1395,7 +1519,7 @@ export const tableAbi = [
               {
                 name: "doubleRule",
                 type: "uint8",
-                internalType: "enum Table.DoubleRule",
+                internalType: "enum ITable.DoubleRule",
               },
               {
                 name: "maxResplitHands",
@@ -1456,7 +1580,7 @@ export const tableAbi = [
       {
         name: "_betRange",
         type: "tuple",
-        internalType: "struct Table.BetRange",
+        internalType: "struct ITable.BetRange",
         components: [
           {
             name: "min",
@@ -1473,7 +1597,7 @@ export const tableAbi = [
       {
         name: "_rules",
         type: "tuple",
-        internalType: "struct Table.Rules",
+        internalType: "struct ITable.Rules",
         components: [
           {
             name: "deckCount",
@@ -1483,7 +1607,7 @@ export const tableAbi = [
           {
             name: "deckReset",
             type: "uint8",
-            internalType: "enum Table.DeckReset",
+            internalType: "enum ITable.DeckReset",
           },
           {
             name: "dealerHitOnSoft17",
@@ -1498,7 +1622,7 @@ export const tableAbi = [
           {
             name: "doubleRule",
             type: "uint8",
-            internalType: "enum Table.DoubleRule",
+            internalType: "enum ITable.DoubleRule",
           },
           {
             name: "maxResplitHands",
@@ -1563,6 +1687,19 @@ export const tableAbi = [
   },
   {
     type: "function",
+    name: "manager",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "owner",
     inputs: [],
     outputs: [
@@ -1616,7 +1753,7 @@ export const tableAbi = [
       {
         name: "",
         type: "uint8",
-        internalType: "enum Table.GameStatus",
+        internalType: "enum ITable.GameStatus",
       },
     ],
     stateMutability: "view",
@@ -1636,26 +1773,36 @@ export const tableAbi = [
   },
   {
     type: "function",
-    name: "s_manager",
-    inputs: [],
-    outputs: [
+    name: "s_seats",
+    inputs: [
       {
         name: "",
-        type: "address",
-        internalType: "address",
+        type: "uint8",
+        internalType: "uint8",
       },
     ],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "s_token",
-    inputs: [],
     outputs: [
       {
-        name: "",
-        type: "address",
-        internalType: "address",
+        name: "info",
+        type: "tuple",
+        internalType: "struct ITable.SeatInfo",
+        components: [
+          {
+            name: "player",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "bet",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "waiting",
+            type: "bool",
+            internalType: "bool",
+          },
+        ],
       },
     ],
     stateMutability: "view",
@@ -1667,7 +1814,7 @@ export const tableAbi = [
       {
         name: "_betRange",
         type: "tuple",
-        internalType: "struct Table.BetRange",
+        internalType: "struct ITable.BetRange",
         components: [
           {
             name: "min",
@@ -1737,6 +1884,19 @@ export const tableAbi = [
     inputs: [],
     outputs: [],
     stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "token",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    stateMutability: "view",
   },
   {
     type: "function",

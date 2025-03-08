@@ -9,13 +9,12 @@ import {
 } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { Close, WarningCircle } from "../../ui/Icons";
-import { pitInfo, tokens } from "../../lib/constants";
 import Image from "next/image";
 import { tableAbi } from "../../../abi";
 import {
   Address,
   GameStatus,
-  ManagerToken,
+  Seat,
   SeatInfo,
   TableInfo,
 } from "../../lib/definitions";
@@ -48,6 +47,16 @@ const Table = ({ params }: TableProps) => {
   });
 
   const table = tableData as TableInfo;
+
+  const { data: seatData } = useReadContract({
+    address: tableAddress,
+    abi: tableAbi,
+    functionName: "getSeats",
+  });
+
+  const seats = seatData as Seat[];
+
+  console.log("SeAtS", seats);
 
   useWatchContractEvent({
     address: tableAddress,
@@ -145,8 +154,6 @@ const Table = ({ params }: TableProps) => {
     );
   };
 
-  console.log("TABLE", table);
-
   if (!table) {
     return (
       <>
@@ -160,7 +167,7 @@ const Table = ({ params }: TableProps) => {
 
   return (
     <div
-      className="flex flex-col h-full w-full py-48 items-center justify-between"
+      className="flex flex-col h-full w-full py-[10%] items-center justify-between"
       style={{ background: "radial-gradient(#4ea851, #295d2d)" }}
     >
       <div
@@ -169,11 +176,14 @@ const Table = ({ params }: TableProps) => {
       >
         DEALER
       </div>
+
       <div className="flex flex-row" style={{ gap: 200 / seatCount }}>
         {table.seats.map((seat, index) => {
           const isEmpty = seat.player === zeroAddress;
           const isCurrentUser = seat.player === account.address;
           const canSit = !isManager && isEmpty && !gameStarted;
+          const hands = seats[index].hands;
+          const currentHand = hands[hands.length - 1];
 
           const rotation = 20 - (40 / (seatCount - 1)) * index;
 
@@ -214,20 +224,21 @@ const Table = ({ params }: TableProps) => {
                   );
                 }}
               >
-                <Image
-                  src={`/card${index + 7}.svg`}
-                  alt={`card${index + 7}`}
-                  width={100}
-                  height={140}
-                  className="shadow-md z-10"
-                />
-                <Image
-                  src={`/card${index + 15}.svg`}
-                  alt={`card${index + 15}`}
-                  width={100}
-                  height={140}
-                  className="shadow-md"
-                  style={{ marginTop: -130, marginLeft: 60 }}
+                <div className="z-10">
+                  {currentHand?.cards.map((c, i) => (
+                    <Image
+                      src={`/card${c}.svg`}
+                      alt={`card${c}`}
+                      width={100}
+                      height={140}
+                      className="shadow-md z-10 relative rounded-md"
+                      style={{ marginTop: -120, marginLeft: i * 30 }}
+                    />
+                  ))}
+                </div>
+                <div
+                  className="rounded-md outline-amber-300 outline outline-4 opacity-50"
+                  style={{ width: 100, height: 140, marginTop: -40 }}
                 />
                 {getSeatText(seat)}
                 {isCurrentUser && !gameStarted && (

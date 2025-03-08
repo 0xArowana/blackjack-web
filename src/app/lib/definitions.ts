@@ -87,4 +87,9 @@ export type SeatInfo = {
   waiting: boolean;
 };
 
+export type Seat = {
+  info: SeatInfo;
+  hands: Hand[];
+};
+
 export type Address = `0x${string}`;

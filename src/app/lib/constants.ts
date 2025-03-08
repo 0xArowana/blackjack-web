@@ -1,4 +1,4 @@
 import { pitAbi } from "@/abi";
 
-export const pitAddress = "0x8C34303C98cf94b2A332293E0888DFaF9C8ddAec";
+export const pitAddress = "0xCF31244DfC4160E92d1BFE675e93f39EED452253";
 export const pitInfo: any = { address: pitAddress, abi: pitAbi };
