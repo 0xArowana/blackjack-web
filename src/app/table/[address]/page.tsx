@@ -56,8 +56,6 @@ const Table = ({ params }: TableProps) => {
 
   const seats = seatData as Seat[];
 
-  console.log("SeAtS", seats);
-
   useWatchContractEvent({
     address: tableAddress,
     abi: tableAbi,
@@ -120,14 +118,17 @@ const Table = ({ params }: TableProps) => {
 
   const getSeatText = (seat: SeatInfo) => {
     if (seat.player === zeroAddress) {
-      return isManager || gameStarted ? "EMPTY" : "SIT";
+      return isManager || gameStarted ? "" : "SIT";
     }
+
+    const shortAddress =
+      seat.player.slice(0, 7) + "..." + seat.player.slice(37, 42);
 
     if (seat.player === account.address) {
-      return "YOU";
+      return `YOU (${shortAddress})`;
     }
 
-    return "OCCUPIED";
+    return shortAddress;
   };
 
   const resetBet = () => {
@@ -167,121 +168,133 @@ const Table = ({ params }: TableProps) => {
 
   return (
     <div
-      className="flex flex-col h-full w-full py-[10%] items-center justify-between"
+      className="flex flex-col h-full w-full pt-36 items-center"
       style={{ background: "radial-gradient(#4ea851, #295d2d)" }}
     >
       <div
-        className="flex justify-center items-center flex-col p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800"
+        className="flex justify-center items-center flex-col bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800"
         style={{ height: 140, width: 100 }}
       >
         DEALER
       </div>
 
-      <div className="flex flex-row" style={{ gap: 200 / seatCount }}>
-        {table.seats.map((seat, index) => {
-          const isEmpty = seat.player === zeroAddress;
-          const isCurrentUser = seat.player === account.address;
-          const canSit = !isManager && isEmpty && !gameStarted;
-          const hands = seats[index].hands;
-          const currentHand = hands[hands.length - 1];
+      {table.seats.map((seat, index) => {
+        const isEmpty = seat.player === zeroAddress;
+        const isCurrentUser = seat.player === account.address;
+        const canSit = !isManager && isEmpty && !gameStarted;
 
-          const rotation = 20 - (40 / (seatCount - 1)) * index;
+        const arc = 80 + 20 * (seatCount - 3);
+        const rotation = (index * arc) / (seatCount - 1) - arc / 2;
 
-          return (
+        const hands = seats[index].hands;
+        const currentHand = hands[hands.length - 1];
+        const cardCount = currentHand?.cards.length ?? 0;
+
+        return (
+          <div
+            style={{
+              position: "absolute",
+              bottom: "10%",
+              transformOrigin: "top center",
+              transform: `rotate(${rotation}deg)`,
+              paddingTop: 340,
+            }}
+          >
             <div
-              style={{
-                transform: `rotate(${rotation}deg)`,
-                marginTop:
-                  (seatCount * -Math.abs(rotation ** 2)) / Math.PI / 13,
+              className={`flex justify-center items-center flex-col ${canSit ? `cursor-pointer` : ""}`}
+              key={`table-spot-${index}`}
+              onClick={() => {
+                if (!canSit) return;
+
+                if (!account.address) {
+                  openConnectModal?.();
+                  return;
+                }
+
+                writeContract(
+                  {
+                    abi: tableAbi,
+                    address: tableAddress,
+                    functionName: "sit",
+                    args: [index],
+                  },
+                  {
+                    onError: (e) => {
+                      console.log(e);
+                    },
+                    onSuccess: () => {
+                      refetch();
+                    },
+                  }
+                );
               }}
             >
+              {currentHand?.cards.map((c, i) => {
+                return (
+                  <Image
+                    src={`/card${c}.svg`}
+                    alt={`card${c}`}
+                    width={100}
+                    height={140}
+                    className="shadow-md absolute rounded-md"
+                    style={{
+                      zIndex: 10 + i,
+                      top: 280 - 10 * i,
+                      left: `calc(50% - ${50 - 28 * i + (cardCount - 1) * 14}px)`,
+                    }}
+                  />
+                );
+              })}
               <div
-                className={`flex justify-center items-center flex-col p-6 ${canSit ? `dark:bg-gray-800 cursor-pointer` : ""} gap-2`}
-                key={`table-spot-${index}`}
-                onClick={() => {
-                  if (!canSit) return;
-
-                  if (!account.address) {
-                    openConnectModal?.();
-                    return;
-                  }
-
-                  writeContract(
-                    {
-                      abi: tableAbi,
-                      address: tableAddress,
-                      functionName: "sit",
-                      args: [index],
-                    },
-                    {
-                      onError: (e) => {
-                        console.log(e);
-                      },
-                      onSuccess: () => {
-                        refetch();
-                      },
-                    }
-                  );
+                className="rounded-md outline-amber-300 outline outline-4 opacity-50"
+                style={{
+                  width: 100,
+                  height: 140,
+                  backgroundColor: isCurrentUser ? "blue" : "",
                 }}
-              >
-                <div className="z-10">
-                  {currentHand?.cards.map((c, i) => (
-                    <Image
-                      src={`/card${c}.svg`}
-                      alt={`card${c}`}
-                      width={100}
-                      height={140}
-                      className="shadow-md z-10 relative rounded-md"
-                      style={{ marginTop: -120, marginLeft: i * 30 }}
-                    />
-                  ))}
-                </div>
-                <div
-                  className="rounded-md outline-amber-300 outline outline-4 opacity-50"
-                  style={{ width: 100, height: 140, marginTop: -40 }}
-                />
-                {getSeatText(seat)}
-                {isCurrentUser && !gameStarted && (
-                  <button
-                    onClick={() => {
-                      writeContract(
-                        {
-                          abi: tableAbi,
-                          address: tableAddress,
-                          functionName: "leave",
-                          args: [index],
+              />
+              <div className="h-10 flex items-center">{getSeatText(seat)}</div>
+              {isCurrentUser && !gameStarted && (
+                <button
+                  onClick={() => {
+                    writeContract(
+                      {
+                        abi: tableAbi,
+                        address: tableAddress,
+                        functionName: "leave",
+                        args: [index],
+                      },
+                      {
+                        onError: (e) => {
+                          console.log(e);
                         },
-                        {
-                          onError: (e) => {
-                            console.log(e);
-                          },
-                          onSuccess: () => {
-                            refetch();
-                          },
-                        }
-                      );
-                    }}
-                    className="btn"
-                  >
-                    Leave
-                  </button>
-                )}
-                {isCurrentUser && table.gameStatus == GameStatus.Bet && (
-                  <button
-                    onClick={() => {
-                      refetch();
-                      document.getElementById("bet_modal")?.showModal();
-                    }}
-                    className="btn"
-                  >
-                    Place Bet
-                  </button>
-                )}
-              </div>
+                        onSuccess: () => {
+                          refetch();
+                        },
+                      }
+                    );
+                  }}
+                  className="btn"
+                >
+                  Leave
+                </button>
+              )}
+              {isCurrentUser && table.gameStatus == GameStatus.Bet && (
+                <button
+                  onClick={() => {
+                    refetch();
+                    document.getElementById("bet_modal")?.showModal();
+                  }}
+                  className="btn"
+                >
+                  Place Bet
+                </button>
+              )}
             </div>
-          );
-        })}
-      </div>
+          </div>
+        );
+      })}
+
       <dialog id="bet_modal" className="modal">
         <div className="modal-box flex flex-col">
           <div className="self-end">

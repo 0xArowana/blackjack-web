@@ -2061,6 +2061,12 @@ export const tableAbi = [
         indexed: true,
         internalType: "enum Table.DrawRequest",
       },
+      {
+        name: "randomWords",
+        type: "uint256[]",
+        indexed: true,
+        internalType: "uint256[]",
+      },
     ],
     anonymous: false,
   },
