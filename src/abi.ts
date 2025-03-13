@@ -1328,6 +1328,72 @@ export const tableAbi = [
   },
   {
     type: "function",
+    name: "getCurrentSeatIndex",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "uint8",
+        internalType: "uint8",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getDealerHand",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "tuple",
+        internalType: "struct Table.Hand",
+        components: [
+          {
+            name: "cards",
+            type: "uint8[]",
+            internalType: "uint8[]",
+          },
+          {
+            name: "minValue",
+            type: "uint8",
+            internalType: "uint8",
+          },
+          {
+            name: "aceCount",
+            type: "uint8",
+            internalType: "uint8",
+          },
+          {
+            name: "status",
+            type: "uint8",
+            internalType: "enum Table.HandStatus",
+          },
+          {
+            name: "doubled",
+            type: "bool",
+            internalType: "bool",
+          },
+        ],
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getManager",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "getSeats",
     inputs: [],
     outputs: [
@@ -1565,6 +1631,19 @@ export const tableAbi = [
   },
   {
     type: "function",
+    name: "getToken",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "initialize",
     inputs: [
       {
@@ -1684,19 +1763,6 @@ export const tableAbi = [
     inputs: [],
     outputs: [],
     stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    name: "manager",
-    inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "address",
-        internalType: "address",
-      },
-    ],
-    stateMutability: "view",
   },
   {
     type: "function",
@@ -1884,19 +1950,6 @@ export const tableAbi = [
     inputs: [],
     outputs: [],
     stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    name: "token",
-    inputs: [],
-    outputs: [
-      {
-        name: "",
-        type: "address",
-        internalType: "address",
-      },
-    ],
-    stateMutability: "view",
   },
   {
     type: "function",

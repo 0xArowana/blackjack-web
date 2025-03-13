@@ -8,17 +8,19 @@ import {
   useWriteContract,
 } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { Close, WarningCircle } from "../../ui/Icons";
+import { Close, WarningCircle, Chip } from "../../ui/Icons";
 import Image from "next/image";
 import { tableAbi } from "../../../abi";
 import {
   Address,
   GameStatus,
+  Hand,
   Seat,
   SeatInfo,
   TableInfo,
 } from "../../lib/definitions";
 import { erc20Abi, zeroAddress } from "viem";
+import Avatar from "@/app/ui/Avatar";
 
 interface TableProps {
   params: Promise<{ address: string }>;
@@ -55,6 +57,22 @@ const Table = ({ params }: TableProps) => {
   });
 
   const seats = seatData as Seat[];
+
+  const { data: dealerHandData } = useReadContract({
+    address: tableAddress,
+    abi: tableAbi,
+    functionName: "getDealerHand",
+  });
+
+  const dealerHand = dealerHandData as Hand;
+
+  const { data: currentSeatData } = useReadContract({
+    address: tableAddress,
+    abi: tableAbi,
+    functionName: "getCurrentSeatIndex",
+  });
+
+  const currentSeatIndex = currentSeatData as number;
 
   useWatchContractEvent({
     address: tableAddress,
@@ -117,15 +135,13 @@ const Table = ({ params }: TableProps) => {
   );
 
   const getSeatText = (seat: SeatInfo) => {
-    if (seat.player === zeroAddress) {
-      return isManager || gameStarted ? "" : "SIT";
-    }
+    if (seat.player === zeroAddress) return "";
 
     const shortAddress =
-      seat.player.slice(0, 7) + "..." + seat.player.slice(37, 42);
+      seat.player.slice(0, 5) + "..." + seat.player.slice(39, 42);
 
     if (seat.player === account.address) {
-      return `YOU (${shortAddress})`;
+      return `${shortAddress} (You)`;
     }
 
     return shortAddress;
@@ -171,16 +187,27 @@ const Table = ({ params }: TableProps) => {
       className="flex flex-col h-full w-full pt-36 items-center"
       style={{ background: "radial-gradient(#4ea851, #295d2d)" }}
     >
-      <div
-        className="flex justify-center items-center flex-col bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800"
-        style={{ height: 140, width: 100 }}
-      >
-        DEALER
+      <div>
+        {dealerHand?.cards.map((c, i) => {
+          return (
+            <Image
+              src={`/card${c}.svg`}
+              alt={`card${c}`}
+              width={100}
+              height={140}
+              className="shadow-md rounded-md"
+              style={{
+                zIndex: 10 + i,
+              }}
+            />
+          );
+        })}
       </div>
 
       {table.seats.map((seat, index) => {
         const isEmpty = seat.player === zeroAddress;
         const isCurrentUser = seat.player === account.address;
+        const isCurrentPlayer = currentSeatIndex - 1 === index;
         const canSit = !isManager && isEmpty && !gameStarted;
 
         const arc = 80 + 20 * (seatCount - 3);
@@ -194,10 +221,9 @@ const Table = ({ params }: TableProps) => {
           <div
             style={{
               position: "absolute",
-              bottom: "10%",
               transformOrigin: "top center",
               transform: `rotate(${rotation}deg)`,
-              paddingTop: 340,
+              bottom: 680,
             }}
           >
             <div
@@ -216,7 +242,7 @@ const Table = ({ params }: TableProps) => {
                     abi: tableAbi,
                     address: tableAddress,
                     functionName: "sit",
-                    args: [index],
+                    args: [index + 1],
                   },
                   {
                     onError: (e) => {
@@ -229,31 +255,122 @@ const Table = ({ params }: TableProps) => {
                 );
               }}
             >
-              {currentHand?.cards.map((c, i) => {
-                return (
+              {currentHand?.cards.map((c, i) => (
+                <div
+                  style={{
+                    width: 100,
+                    height: 140,
+                    position: "absolute",
+                    zIndex: 10 + i,
+                    top: 280 - 10 * i,
+                    left: `calc(50% - ${50 - 28 * i + (cardCount - 1) * 14}px)`,
+                  }}
+                >
                   <Image
-                    src={`/card${c}.svg`}
-                    alt={`card${c}`}
                     width={100}
                     height={140}
-                    className="shadow-md absolute rounded-md"
-                    style={{
-                      zIndex: 10 + i,
-                      top: 280 - 10 * i,
-                      left: `calc(50% - ${50 - 28 * i + (cardCount - 1) * 14}px)`,
-                    }}
+                    src={`/card${c}.svg`}
+                    alt={`card${c}`}
+                    className="shadow-md rounded-md"
                   />
-                );
-              })}
+                  {i === currentHand?.cards.length - 1 && (
+                    <div
+                      className="absolute flex items-center justify-center text-white"
+                      style={{
+                        background: "rgb(0, 0, 0, 0.6)",
+                        borderRadius: "50%",
+                        zIndex: 100,
+                        height: 30,
+                        width: 30,
+                        top: -10,
+                        right: -10,
+                      }}
+                    >
+                      {currentHand.minValue}
+                    </div>
+                  )}
+                </div>
+              ))}
               <div
-                className="rounded-md outline-amber-300 outline outline-4 opacity-50"
+                className="rounded-md outline-amber-300 outline outline-4 opacity-50 absolute"
                 style={{
                   width: 100,
                   height: 140,
-                  backgroundColor: isCurrentUser ? "blue" : "",
+                  top: 350,
                 }}
               />
-              <div className="h-10 flex items-center">{getSeatText(seat)}</div>
+              {isCurrentPlayer && (
+                <div
+                  className="absolute opacity-30"
+                  style={{
+                    width: 100,
+                    height: 140,
+                    bottom: 0,
+                    top: 350,
+                    background: "#0ff",
+                    borderRadius: 10,
+                    boxShadow: "0 0 20px 20px #0ff",
+                  }}
+                />
+              )}
+              {seat.bet > 0 && (
+                <div style={{ position: "absolute", top: 425, zIndex: 1000 }}>
+                  <Chip color="blue" />
+                  <div className="text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 font-bold flex flex-col justify-center items-center">
+                    <div>
+                      {`${Number(seat.bet) / 10 ** table.tokenInfo.decimals}`}
+                    </div>
+                    <div style={{ fontSize: 10, marginTop: -6 }}>
+                      {table.tokenInfo.symbol}
+                    </div>
+                  </div>
+                </div>
+              )}
+              {seat.player !== zeroAddress && (
+                <div
+                  className="absolute flex items-center gap-2 font-bold px-2"
+                  style={{
+                    top: 520,
+                    height: 32,
+                    borderRadius: 16,
+                    width: 190,
+                    background:
+                      "linear-gradient(rgb(78, 168, 81, 0.3), rgb(41, 93, 45, 0.3))",
+                  }}
+                >
+                  <Avatar address={seat.player} size={20} />
+                  {getSeatText(seat)}
+                </div>
+              )}
+              {isCurrentUser && isCurrentPlayer && (
+                <div className="absolute flex join" style={{ top: 570 }}>
+                  <button
+                    className="btn btn-soft btn-info join-item w-20"
+                    onClick={() => {
+                      writeContract(
+                        {
+                          abi: tableAbi,
+                          address: tableAddress,
+                          functionName: "requestHit",
+                        },
+                        {
+                          onError: (e) => {
+                            console.log(e);
+                          },
+                          onSuccess: () => {
+                            refetch();
+                          },
+                        }
+                      );
+                    }}
+                  >
+                    Hit
+                  </button>
+                  <button className="btn btn-soft btn-error join-item w-20">
+                    Stand
+                  </button>
+                </div>
+              )}
               {isCurrentUser && !gameStarted && (
                 <button
                   onClick={() => {

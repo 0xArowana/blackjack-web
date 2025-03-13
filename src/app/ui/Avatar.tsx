@@ -11,6 +11,8 @@ const Avatar: AvatarComponent = ({ address, ensImage, size }) => {
   ) : (
     <svg
       viewBox="0 0 128 128"
+      width={size}
+      height={size}
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
